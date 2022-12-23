@@ -19,8 +19,28 @@ import to from "../images/tehobeng.jpg";
 import sf from "../images/sanford.jpg";
 import babu from "../images/babu.jpg";
 import Header from "./Header";
+import axios from "axios";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const DaftarMenu = () => {
+  const [menu, setMenu] = useState([]);
+
+  const loadMenu = async () => {
+    try {
+      await axios.get(`http://localhost:8080/api/produk`).then((res) => {
+        setMenu(res.data.data);
+        console.log(res.data.data);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    loadMenu();
+  }, []);
+
   return (
     // judul
     <div>
@@ -28,20 +48,24 @@ const DaftarMenu = () => {
         {/* <Image src={bg} style={{ display: "relative", width: "100vw", height: "50vh ", objectFit: "cover" }}></Image> */}
         <Header />
       </div>
-      <div style={{ marginTop: " 3rem", display: "flex", justifyContent: "center" }}>
+      <div style={{ marginTop: " 3rem", justifyContent: "center", marginRight: "2rem", gridTemplateColumns: "1fr 1fr 1fr 1fr", display: "grid", gap: "3rem" }}>
         {/* <Image src={babu} /> */}
-        <Card style={{ width: "18rem" }}>
-          <Card.Img variant="top" src={mie} />
-          <Card.Body style={{ textAlign: "Center" }}>
-            <Card.Title>Mie Ayam</Card.Title>
-            <Card.Text>Rp.15.000</Card.Text>
-            <Button variant="primary" style={{ width: "10rem" }}>
-              BELI
-            </Button>
-          </Card.Body>
-        </Card>
-
-        <Card style={{ width: "18rem", marginLeft: "2rem" }}>
+        {menu &&
+          menu.map((menu, index) => {
+            return (
+              <Card style={{ width: "18rem", marginLeft: "2rem" }}>
+                <Card.Img variant="top" src={require(`../images/${menu.gambar}`)} />
+                <Card.Body style={{ textAlign: "Center" }}>
+                  <Card.Title>{menu.menu}</Card.Title>
+                  <Card.Text>{menu.harga}</Card.Text>
+                  <Button variant="primary" style={{ width: "10rem" }}>
+                    BELI
+                  </Button>
+                </Card.Body>
+              </Card>
+            );
+          })}
+        {/* <Card style={{ width: "18rem", marginLeft: "2rem" }}>
           <Card.Img variant="top" src={bakso} />
           <Card.Body style={{ textAlign: "Center" }}>
             <Card.Title>Bakso</Card.Title>
@@ -164,7 +188,7 @@ const DaftarMenu = () => {
               BELI
             </Button>
           </Card.Body>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
