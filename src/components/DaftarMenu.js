@@ -25,6 +25,7 @@ import { useEffect } from "react";
 
 const DaftarMenu = () => {
   const [menu, setMenu] = useState([]);
+  const [dataBeli, setdataBeli] = useState([]);
 
   const loadMenu = async () => {
     try {
@@ -36,6 +37,85 @@ const DaftarMenu = () => {
       console.error(error);
     }
   };
+
+  const beli = async (id) => {
+    try {
+      await axios.get(`http://localhost:8080/api/produk/${id}`).then((res) => {
+        setdataBeli(res.data.data[0]);
+        console.log(res.data.data[0]);
+        var respon = res.data.data;
+        if (Object.values(respon).length > 0) {
+          var obj = {
+            "id_user": 2,
+            "tanggal_pemesanan": "2022-12-29"
+          }
+          var pms = pemesanan(obj);
+          var objProduct = {
+            "id_pemesanan": 1, //pms
+            "id_menu": 2, //respon index[0].id_menu
+            "quantity": 1 //
+          }
+          pemesananProduk(objProduct)
+        } else {
+          alert("data tidak ditemukan");
+        }
+
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const pemesanan = async (values) => {
+    var result = [];
+    var data = JSON.stringify(values);
+    var config = {
+      method: 'post',
+      url: 'http://localhost:8080/api/pemesanan',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      data : data
+    };
+
+    await axios(config)
+    .then(function (response) {
+      result = response.data;
+      console.log(JSON.stringify(response.data));
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    return result;
+  }
+
+  const pemesananProduk = (order) => {
+    var data = JSON.stringify(order);
+    
+    var config = {
+      method: 'post',
+      url: 'http://localhost:8080/api/pemesanan/order',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      data : data
+    };
+    
+    axios(config)
+    .then(function (response) {
+      console.log(JSON.stringify(response.data));
+      var respon = response.data;
+      if (respon.result === true) {
+        window.location.href = "/Pesanan";
+      } else {
+        alert("gagal");
+      }
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    
+  }
 
   useEffect(() => {
     loadMenu();
@@ -53,12 +133,12 @@ const DaftarMenu = () => {
         {menu &&
           menu.map((menu, index) => {
             return (
-              <Card style={{ width: "18rem", marginLeft: "2rem" }}>
+              <Card key={index} style={{ width: "18rem", marginLeft: "2rem" }}>
                 <Card.Img variant="top" src={require(`../images/${menu.gambar}`)} />
                 <Card.Body style={{ textAlign: "Center" }}>
                   <Card.Title>{menu.menu}</Card.Title>
                   <Card.Text>{menu.harga}</Card.Text>
-                  <Button variant="primary" style={{ width: "10rem" }}>
+                  <Button variant="primary" style={{ width: "10rem" }} onClick = {(e) =>  beli(menu.id_menu)}>
                     BELI
                   </Button>
                 </Card.Body>

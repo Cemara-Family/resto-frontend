@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import db from "./components/connection";
+import 'antd/dist/reset.css';
 
 // var axios = require("axios");
 // var data = JSON.stringify({
