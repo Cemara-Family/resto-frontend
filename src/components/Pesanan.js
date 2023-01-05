@@ -1,14 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import "@fortawesome/fontawesome-free/css/all.css";
 import Button from "react-bootstrap/Button";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
+import axios from "axios";
 
 const Pesanan = () => {
-  // const count =() => {
+  const [order, setOrder] = useState([]);
+  const idUser = localStorage.getItem("id_user");
 
-  // }
+  const pesanan = async () => {
+    try {
+      await axios.get(`http://localhost:8080/api/pemesanan`).then((res) => {
+        setOrder(res.data.data);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // console.log(order);
+
+  useEffect(() => {
+    pesanan();
+  }, [pesanan]);
 
   return (
     <div>
@@ -25,8 +41,14 @@ const Pesanan = () => {
           <Dropdown.Item href="#/action-3">50</Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
+
+      {/* {order &&
+        order
+          .filter((order) => order.id_user == idUser)
+          .map((order, index) => {
+            return ( */}
       <div className="table-responsive" style={{ marginTop: "3rem" }}>
-        <table className="table" style={{}}>
+        <table className="table">
           <thead>
             <tr>
               <th>
@@ -61,18 +83,28 @@ const Pesanan = () => {
           </thead>
 
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>mie ayam</td>
-              <td>Rp.12.000</td>
-              <td>1</td>
-              <td>Rp.12.000</td>
-              <td>
-                <button className="btn btn-sm btn-danger">
-                  <em className="fas fa-trash"></em>
-                </button>
-              </td>
-            </tr>
+            {order &&
+              order
+                .filter((order) => order.id_user == idUser)
+                .map((order, index) => {
+                  return (
+                    <>
+                      {console.log(order.produks[0])}
+                      <tr>
+                        <td>{index}</td>
+                        <td>{order.produks[0]?.menu}</td>
+                        <td>{order.produks[0]?.harga}</td>
+                        <td>1</td>
+                        <td>{order.produks[0]?.harga}</td>
+                        <td>
+                          <button className="btn btn-sm btn-danger">
+                            <em className="fas fa-trash"></em>
+                          </button>
+                        </td>
+                      </tr>
+                    </>
+                  );
+                })}
             <tr>
               <td colspan="4">Total Belanja</td>
               <td>Rp. 500.000</td>
@@ -88,6 +120,8 @@ const Pesanan = () => {
           <Button variant="success">Konfirmasi Pesanan </Button>
         </div>
       </div>
+      {/* );
+          })} */}
     </div>
   );
 
